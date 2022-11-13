@@ -127,7 +127,7 @@ func TestUpdateCompany(t *testing.T) {
 
 func TestDeleteCompany(t *testing.T) {
 
-	router.DELETE(CompanyEndpoint+"/:id", service.GetCompany)
+	router.DELETE(CompanyEndpoint+"/:id", service.DeleteCompany)
 	req, _ := http.NewRequest("DELETE", CompanyEndpoint+"/1", nil)
 	req.Header.Set("Authorization", token)
 	w := httptest.NewRecorder()
