@@ -15,6 +15,9 @@ Api Documentation : https://documenter.getpostman.com/view/8736410/2s8YeuKWHN
 
 Postman Collection : https://www.getpostman.com/collections/5630d2a75a18f89c3288
 
+## Prerequisites:
+
+The application requires docker to be installed before running this application.
 
 ## Run application:
 
