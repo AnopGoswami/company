@@ -18,9 +18,13 @@ Postman Collection : https://www.getpostman.com/collections/5630d2a75a18f89c3288
 
 ## Run application:
 
+The below command will build and run microservice in docker container.
+
 ```
-make run
+sudo docker-compose up
 ```
+
+Microservice health check can be checked on http://localhost:5000/v1/healthcheck
 
 ## Run tests:
 
