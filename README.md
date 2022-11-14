@@ -21,7 +21,8 @@ The application requires docker to be installed before running this application.
 
 ## Run application:
 
-The below command will build and run microservice in docker container.
+Clone the application source code on your local machine and run below command at root of the application. This command
+will build and run microservice in docker container.
 
 ```
 sudo docker-compose up
