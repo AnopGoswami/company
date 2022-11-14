@@ -3,6 +3,7 @@ package tests
 import (
 	"bytes"
 	"company/controllers"
+	"company/middlewares"
 	"company/models"
 	"encoding/json"
 	"io/ioutil"
@@ -31,13 +32,22 @@ var (
 
 func init() {
 	router, service = utils.SetUpTest()
+	api := router.Group("/v1")
+	{
+		api.GET("/healthcheck", service.HealthCheck)
+		api.POST("/token", service.GenerateToken)
+		api.POST("/user", service.RegisterUser)
+		api.POST("/company", service.RegisterCompany).Use(middlewares.Auth())
+		api.GET("/company/:id", service.GetCompany).Use(middlewares.Auth())
+		api.PATCH("/company/:id", service.UpdateCompany).Use(middlewares.Auth())
+		api.DELETE("/company/:id", service.DeleteCompany).Use(middlewares.Auth())
+	}
+	gin.SetMode(gin.ReleaseMode)
 }
 
 func TestHealthcheck(t *testing.T) {
 
 	mockResponse := `{"status":"ok"}`
-
-	router.GET(HelathCheckEndpoint, service.HealthCheck)
 	req, _ := http.NewRequest("GET", HelathCheckEndpoint, nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -48,8 +58,6 @@ func TestHealthcheck(t *testing.T) {
 }
 
 func TestAddUser(t *testing.T) {
-
-	router.POST(UserEndpoint, service.RegisterUser)
 
 	user := models.User{
 		Username: "new user",
@@ -71,11 +79,9 @@ func TestGetToken(t *testing.T) {
 		Username: "test user a",
 		Password: "mypasswd",
 	}
-
 	jsonValue, _ := json.Marshal(user)
 
 	//Get token
-	router.POST(TokenEndpoint, service.GenerateToken)
 	req, _ := http.NewRequest("POST", TokenEndpoint, bytes.NewBuffer(jsonValue))
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -91,46 +97,37 @@ func TestGetToken(t *testing.T) {
 }
 
 func TestAddCompany(t *testing.T) {
-
-	router.POST(CompanyEndpoint, service.RegisterCompany)
 	company := models.Company{Name: "Test Company 1", Description: "This is test company description", Employees: 10, Registered: true, Type: "NonProfit"}
-
 	jsonValue, _ := json.Marshal(company)
 	req, _ := http.NewRequest("POST", CompanyEndpoint, bytes.NewBuffer(jsonValue))
+	req.Header.Set("Authorization", token)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
-
 	assert.Equal(t, http.StatusCreated, w.Code)
 }
 
 func TestGetCompany(t *testing.T) {
-
-	router.GET(CompanyEndpoint+"/:id", service.GetCompany)
 	req, _ := http.NewRequest("GET", CompanyEndpoint+"/1", nil)
 	req.Header.Set("Authorization", token)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 }
 
 func TestUpdateCompany(t *testing.T) {
-
 	company := models.Company{Name: "Test Company D", Description: "This is test company description", Employees: 10, Registered: true, Type: "NonProfit"}
 	jsonValue, _ := json.Marshal(company)
-	router.PATCH("/v1/company/:id", service.UpdateCompany)
-	req, _ := http.NewRequest("PATCH", "/v1/company/1", bytes.NewBuffer(jsonValue))
+	req, _ := http.NewRequest("PATCH", CompanyEndpoint+"/1", bytes.NewBuffer(jsonValue))
 	req.Header.Set("Authorization", token)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 }
 
 func TestDeleteCompany(t *testing.T) {
-
-	router.DELETE(CompanyEndpoint+"/:id", service.DeleteCompany)
 	req, _ := http.NewRequest("DELETE", CompanyEndpoint+"/1", nil)
 	req.Header.Set("Authorization", token)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 }
