@@ -2,7 +2,7 @@
 
 ## About Api
 
-This microservice is used to manage companies records. And provided endpoints to add, update, get and delete companies.
+This microservice is used to manage companies records and provides endpoints to add, update, get and delete companies.
 
 In this api JWT token is used for authenticate user, so user needs to be registered first via user registration api.
 
@@ -28,7 +28,7 @@ will build and run microservice in docker container.
 sudo docker-compose up
 ```
 
-Microservice health check can be checked on http://localhost:5000/v1/healthcheck
+After successfully running application you can check health of the microservice at http://localhost:5000/v1/healthcheck
 
 ## Run tests:
 
